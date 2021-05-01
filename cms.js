@@ -1,13 +1,16 @@
 const mysql = require(`mysql`);
 const inquirer = require(`inquirer`);
+const database = require(`./database.js`)
 
 const start = () => {
-    
+    database.connectDatabase()
+    .then(() => mainMenu())
+
 }
 
 const mainMenu = () => {
     inquirer.prompt({
-        type: `choices`,
+        type: `list`,
         message: `What would you like to do?`,
         choices: [
             `View All Employees By Department`,
@@ -21,7 +24,7 @@ const mainMenu = () => {
         name: `mainMenuChoice`
     })
     .then(response => {
-        switch(response) {
+        switch(response.mainMenuChoice) {
             case `View All Employees By Department`:
                 employeesByDepartment();
                 break;
@@ -50,18 +53,22 @@ const mainMenu = () => {
 }
 
 const employeesByDepartment = () => {
-    inquirer.prompt(
-        {
-            type: `choices`,
-            message: `Which department would you like to view`,
-            choices: [], //FUNCTION: READ DEPARTMENT,
-            name: `departementChoice`
-        }
-    )
-    .then(response => {
-        //SELECT STATMENT response.name
+    database.selectDepartments()
+    .then(selectDepartmentsResults => {
+        inquirer.prompt(
+            {
+                type: `list`,
+                message: `Which department would you like to view`,
+                choices: selectDepartmentsResults,
+                name: `departementChoice`
+            }
+        )
+        .then(departmentChoiceResults => {
+            database.selectEmployeesByDepartment(departmentChoiceResults.departementChoice);
+        })
     })
 }
+
 
 const employeesByManager = () => {
     
@@ -86,3 +93,6 @@ const employeesUpdateManager = () => {
 const rolesView = () => {
     
 }
+
+//Function Calls
+start();
