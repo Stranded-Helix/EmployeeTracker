@@ -1,7 +1,25 @@
 {
   "dependencies": {
-    "dotenv": "^8.2.0",
     "inquirer": "^8.0.0",
     "mysql": "^2.18.1"
-  }
+  },
+  "name": "employeetracker",
+  "description": "Terminal based Employee CMS (Content Management System)",
+  "version": "1.0.0",
+  "main": "cms.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Stranded-Helix/EmployeeTracker.git"
+  },
+  "keywords": [],
+  "author": "Garrett Fite",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Stranded-Helix/EmployeeTracker/issues"
+  },
+  "homepage": "https://github.com/Stranded-Helix/EmployeeTracker#readme"
 }
