@@ -1,7 +1,6 @@
 const mysql = require(`mysql`);
 const inquirer = require(`inquirer`);
 const database = require(`./database.js`);
-const { fetchAsyncQuestionPropertyQuestionProperty } = require("inquirer/lib/utils/utils");
 
 const start = () => {
     database.connectDatabase()
@@ -117,12 +116,10 @@ const employeesByManager = () => {
         })
     })
 }
-
 const employeesAdd = () => {
     Promise.all([database.selectRoles(), database.selectManagers()])
     .then((promiseResults) => {
         promiseResults[1].push({name: `No Manager`, value: -1})
-        console.log(promiseResults);
     inquirer.prompt([
         {
             type: `input`,
@@ -155,7 +152,6 @@ const employeesAdd = () => {
         .then(() => mainMenu())
     })
 }
-
 const employeesRemove = () => {
     database.selectEmployee()
     .then(selectEmployeeResults => {
@@ -172,14 +168,86 @@ const employeesRemove = () => {
         .then(() => mainMenu())
     })
 }
-
 const employeesUpdateRole = () => {
-    
+    Promise.all([database.selectRoles(), database.selectManagers(), database.selectEmployee()])
+    .then((promiseResults) => {
+        console.log(promiseResults);
+        promiseResults[1].push({name: `No Manager`, value: -1})
+    inquirer.prompt([
+        {
+            type: `list`,
+            message: `Employee to Update`,
+            choices: promiseResults[2],
+            name: `employee`
+        },
+        {
+            type: `list`,
+            message: `New Role`,
+            choices: promiseResults[0],
+            name: `role`
+        },
+        {
+            type: `list`,
+            message: `Assign Manager`,
+            choices: promiseResults[1],
+            name: `manager`
+        },
+        ]
+        )
+        .then((inqResults) => {
+            if(inqResults.manager === -1) delete inqResults.manager
+            console.log(inqResults);
+            database.updateEmployee(inqResults.employee, inqResults.role, inqResults.manager);
+        })
+        .then(() => mainMenu())
+    })
 }
-
 const employeesUpdateManager = () => {
     
 }
+
+const roleAdd = () => {
+    database.selectDepartments(1)
+    .then((promiseResults) => {
+    inquirer.prompt([
+        {
+            type: `input`,
+            message: `Role Title`,
+            name: `title`
+        },
+        {
+            type: `input`,
+            message: `Salary`,
+            name: `salary`
+        },
+        {
+            type: `list`,
+            message: `Assign Department`,
+            choices: promiseResults,
+            name: `departmentId`
+        }])
+        .then((inqResults) => {
+            inqResults.salary = parseInt(inqResults.salary);
+            inqResults.departmentId = parseInt(inqResults.departmentId);
+            database.insertRole(inqResults)
+        })
+        .then(() => mainMenu())
+    })
+}
+
+const departmentAdd = () => {
+    inquirer.prompt(
+        {
+            type: `input`,
+            message: `Department Name`,
+            name: `department`
+        })
+        .then((inqResults) => {
+            database.insertDepartment(inqResults)
+        })
+        .then(() => mainMenu())
+}
+
 
 
 //Function Calls

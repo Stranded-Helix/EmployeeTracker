@@ -17,13 +17,21 @@ const connectDatabase = () => {
     })
 };
 
-const selectDepartments = () => {
+const selectDepartments = (id) => {
     return new Promise((resolve, reject) => {
         connection.query(
-            `SELECT department_name 
+            `SELECT id, department_name 
         FROM department`,
             (err, res) => {
                 if (err) reject(`Failed selectDepartment`);
+                if(id) {
+                    resolve(res.map(x => {
+                        return({
+                            name: x.department_name,
+                            value: x.id
+                        })
+                    }));
+                } 
                 resolve(res.map(x => x.department_name));
             });
     });
@@ -100,7 +108,7 @@ const selectRoles = () => {
     });
 }
 
-const selectEmployee = () => {
+const selectEmployee = (id) => {
     return new Promise((resolve, reject) => {
         connection.query(
             `SELECT id, first_name, last_name 
@@ -131,6 +139,38 @@ const insertEmployee = (employee) => {
     })
 }
 
+const insertDepartment = (department) => {
+    return new Promise((resolve, reject) => {
+        connection.query(
+            `INSERT INTO department SET ?`,
+            {
+                department_name: department.department
+            },
+            (err, res) => {
+                if(err) reject(console.log('Failed insertDepartment'));
+                resolve(res);
+            }
+        )
+    })
+}
+
+const insertRole = (role) => {
+    return new Promise((resolve, reject) => {
+        connection.query(
+            `INSERT INTO employee_role SET ?`,
+            {
+                title: role.title,
+                salary: role.salary,
+                department_id: role.departmentId
+            },
+            (err, res) => {
+                if(err) reject(console.log(`insertRole ${err}`));
+                resolve(res);
+            }
+        )
+    })
+}
+
 const deleteEmployee = (employeeId) => {
     return new Promise((resolve, reject) => {
         connection.query(
@@ -141,11 +181,31 @@ const deleteEmployee = (employeeId) => {
                 }
             ],
             (err, res) => {
-                if (err) reject(console.log(`Failed deleteEmployee`));
+                if (err) reject(console.log(`deleteEmployee`));
                 resolve(res)
             });
     })
 }
+
+const updateEmployee = (employeeId, roleId,  managerId) => {
+    return new Promise((resolve, reject) => {
+        connection.query(
+            `UPDATE employees SET ? WHERE ?`,
+            [{
+                role_id: roleId,
+                manager_id: managerId, 
+            },
+            {
+                id:  employeeId
+            }],
+            (err, res) => {
+                if(err) reject(console.log(`insertRole ${err}`));
+                resolve(res);
+            }
+        )
+    })
+}
+
 module.exports = {
     connectDatabase,
     selectDepartments,
@@ -155,6 +215,8 @@ module.exports = {
     selectRoles,
     insertEmployee,
     selectEmployee,
-    deleteEmployee
-
+    deleteEmployee,
+    insertRole,
+    insertDepartment,
+    updateEmployee
 }
