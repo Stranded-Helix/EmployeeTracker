@@ -1,4 +1,5 @@
 const mysql = require(`mysql`);
+require('dotenv').config();
 
 var connection;
 
@@ -6,8 +7,8 @@ const connectDatabase = () => {
     return new Promise((resolve, reject) => {
         connection = mysql.createConnection({
             host: `localhost`,
-            user: `root`,
-            password: `SMUPassword`,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
             database: `employee_tracker_db`
         });
         connection.connect((err) => {
